@@ -46,9 +46,7 @@ create = ->
   map.addTilesetImage 'area01_level_tiles', 'area01_tiles', 32, 32
   layer = map.createLayer 'background'
   layer.resizeWorld()
-  flayer = map.createLayer 'foreground'
   map.setCollision solidTileIndices, true, layer
-  map.setCollision solidTileIndices, true, flayer
 
   playerGroup = game.add.group undefined, 'player_group'
   map.createFromObjects 'objects', 'mainPlayer', 'gripe', 0,
@@ -68,6 +66,9 @@ create = ->
   game.camera.follow player
   game.camera.deadzone = new Phaser.Rectangle(
     scrW/2 - scrW/10, scrH/2 - scrH/10, scrW/5, scrH/5)
+
+  flayer = map.createLayer 'foreground'
+  map.setCollision solidTileIndices, true, flayer
   return
 
 render = ->
