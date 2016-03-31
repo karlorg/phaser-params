@@ -109,12 +109,12 @@ processPlayerTilemap = (player, tile) ->
   tileRight = tileLeft + tile.width
   tileTop = tile.y * tile.height
   tileBot = tileTop + tile.height
-  if (playerFeet >= tileTop and playerFeet < tileBot and
-      playerRight > tileLeft + 2 and playerLeft < tileRight - 2)
+  if (playerFeet >= tileTop - 1 and playerFeet < tileBot and
+      playerRight > tileLeft and playerLeft < tileRight)
     player.grounded = true
     player.jumpExhausted = false
   else if (playerFeet > tileBot and
-           playerRight > tileLeft + 2 and playerLeft < tileRight - 2)
+           playerRight > tileLeft and playerLeft < tileRight)
     player.jumpExhausted = true
   true
 
