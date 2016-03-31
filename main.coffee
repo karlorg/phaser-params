@@ -96,6 +96,7 @@ update = ->
       player.jumpExhausted = true
   else
     player.body.allowGravity = true
+    player.jumpExhausted = true
 
   game.physics.arcade.collide player, layer, (->), processPlayerTilemap
   game.physics.arcade.collide player, flayer, (->), processPlayerTilemap
