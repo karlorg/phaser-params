@@ -59,10 +59,11 @@ create = ->
   player.jumpStartY = null
   player.jumpExhausted = false
   player.enableBody = true
-  player.animations.add 'stand', [2], 1, true
+  player.animations.add 'standright', [2], 1, true
+  player.animations.add 'standleft', [13], 1, true
   player.animations.add 'walkright', [0, 1, 2, 3, 4, 5, 6, 7], 6, true
   player.animations.add 'walkleft', [15, 14, 13, 12, 11, 10, 9, 8], 6, true
-  player.animations.play 'stand'
+  player.animations.play 'standright'
 
   game.camera.follow player
   game.camera.deadzone = new Phaser.Rectangle(
@@ -85,7 +86,9 @@ update = ->
     player.animations.play switch
       when vx < 0 then 'walkleft'
       when vx > 0 then 'walkright'
-      else 'stand'
+      else switch player.animations.name
+        when 'walkleft', 'standleft' then 'standleft'
+        else 'standright'
 
   if keys.jump.isDown and not player.jumpExhausted
     player.body.allowGravity = false
