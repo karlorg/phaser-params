@@ -76,7 +76,7 @@ create = ->
   map.setCollision solidTileIndices, true, flayer
 
   controls = game.add.group undefined, 'control_group'
-  addSlider 'maxH', player, 'jumpMaxHeight', 0, 700
+  addSlider 'maxH', player, 'jumpMaxHeight', 0, 250
   return
 
 render = ->
@@ -151,6 +151,10 @@ addSlider = (label, obj, prop, min, max) ->
   )
   handle.input.draggable = true
   handle.input.allowVerticalDrag = false
+  handle.events.onDragUpdate.add ->
+    newVal = (handle.x / (scrW / 4)) * (max - min)
+    obj[prop] = newVal
+    return
 
   return
 
