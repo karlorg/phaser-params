@@ -57,10 +57,11 @@ create = ->
                         true, false, playerGroup
   player = playerGroup.getAt 0
   game.physics.arcade.enable player
-  player.body.gravity.y = 2000
-  player.body.maxVelocity.y = 1000
+  player.body.gravity.y = 1875
+  player.body.maxVelocity.y = 425
   player.grounded = false
-  player.jumpMaxHeight = 200
+  player.jumpMaxHeight = 67.5
+  player.jumpRiseSpeed = 300
   player.jumpStartY = null
   player.jumpExhausted = false
   player.enableBody = true
@@ -81,6 +82,7 @@ create = ->
   addSlider 'maxH', player, 'jumpMaxHeight', 0, 250
   addSlider 'grav', player.body.gravity, 'y', 0, 5000
   addSlider 'maxVy2', player.body.maxVelocity, 'y', 0, 1800
+  addSlider 'rise', player, 'jumpRiseSpeed', 0, 800
   return
 
 render = ->
@@ -102,7 +104,7 @@ update = ->
 
   if keys.jump.isDown and not player.jumpExhausted
     player.body.allowGravity = false
-    player.body.velocity.y = -400
+    player.body.velocity.y = -player.jumpRiseSpeed
     if player.grounded
       player.jumpStartY = player.y
       player.grounded = false
