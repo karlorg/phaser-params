@@ -58,6 +58,7 @@ create = ->
   player = playerGroup.getAt 0
   game.physics.arcade.enable player
   player.body.gravity.y = 2000
+  player.body.maxVelocity.y = 1000
   player.grounded = false
   player.jumpMaxHeight = 200
   player.jumpStartY = null
@@ -79,6 +80,7 @@ create = ->
   controls = game.add.group undefined, 'control_group'
   addSlider 'maxH', player, 'jumpMaxHeight', 0, 250
   addSlider 'grav', player.body.gravity, 'y', 0, 5000
+  addSlider 'maxVy2', player.body.maxVelocity, 'y', 0, 1800
   return
 
 render = ->
