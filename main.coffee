@@ -13,6 +13,7 @@ keys = null
 layer = null
 flayer = null
 player = null
+sliders = []
 
 playerSpeed = 150
 
@@ -77,6 +78,7 @@ create = ->
 
   controls = game.add.group undefined, 'control_group'
   addSlider 'maxH', player, 'jumpMaxHeight', 0, 250
+  addSlider 'grav', player.body.gravity, 'y', 0, 5000
   return
 
 render = ->
@@ -132,10 +134,11 @@ processPlayerTilemap = (player, tile) ->
 addSlider = (label, obj, prop, min, max) ->
   if obj[prop] == undefined
     console.log "#{obj}.#{prop} not found in addSlider!"
+    return
+
   grp = game.add.group controls, "#{label}_ctl_group"
   grp.fixedToCamera = true
-  grp.x = 0
-  grp.y = 0
+  grp.cameraOffset = { x: 0, y: sliders.length * 32 }
 
   width = 0
 
@@ -160,7 +163,7 @@ addSlider = (label, obj, prop, min, max) ->
     handle.anchor = { x: 0.5, y: 0.5 }
     handle.inputEnabled = true
     handle.input.boundsRect = new Phaser.Rectangle(
-      0, 4, scrW / 4, 28
+      0, 4, scrW / 4, 24
     )
     handle.input.draggable = true
     handle.input.allowVerticalDrag = false
@@ -182,6 +185,8 @@ addSlider = (label, obj, prop, min, max) ->
     obj[prop] = newVal
     valueText.setText newVal
     return
+
+  sliders.push grp
 
   return
 
