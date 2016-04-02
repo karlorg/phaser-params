@@ -6,14 +6,15 @@
 scrW = 640
 scrH = 480
 
+controls = null
+cursors = null
 game = null
+keys = null
 layer = null
 flayer = null
-
-cursors = null
-jumpMaxHeight = 100
-keys = null
 player = null
+sliders = []
+
 playerSpeed = 150
 
 solidTileIndices = [2, 3, 4, 5, 6, 7, 8,
@@ -34,6 +35,7 @@ preload = ->
   game.load.tilemap 'area01', 'assets/area01.json', null,
                     Phaser.Tilemap.TILED_JSON
   game.load.image 'area01_tiles', 'assets/area01_level_tiles.png'
+  game.load.image 'slider_handle', 'assets/slider-handle.png'
   game.load.spritesheet 'gripe', 'assets/gripe.png', 32, 32
   return
 
@@ -56,7 +58,9 @@ create = ->
   player = playerGroup.getAt 0
   game.physics.arcade.enable player
   player.body.gravity.y = 2000
+  player.body.maxVelocity.y = 1000
   player.grounded = false
+  player.jumpMaxHeight = 200
   player.jumpStartY = null
   player.jumpExhausted = false
   player.enableBody = true
@@ -72,6 +76,11 @@ create = ->
 
   flayer = map.createLayer 'foreground'
   map.setCollision solidTileIndices, true, flayer
+
+  controls = game.add.group undefined, 'control_group'
+  addSlider 'maxH', player, 'jumpMaxHeight', 0, 250
+  addSlider 'grav', player.body.gravity, 'y', 0, 5000
+  addSlider 'maxVy2', player.body.maxVelocity, 'y', 0, 1800
   return
 
 render = ->
@@ -97,7 +106,7 @@ update = ->
     if player.grounded
       player.jumpStartY = player.y
       player.grounded = false
-    if player.y < player.jumpStartY - jumpMaxHeight
+    if player.y < player.jumpStartY - player.jumpMaxHeight
       player.jumpExhausted = true
   else
     player.body.allowGravity = true
@@ -123,5 +132,64 @@ processPlayerTilemap = (player, tile) ->
            playerRight > tileLeft and playerLeft < tileRight)
     player.jumpExhausted = true
   true
+
+addSlider = (label, obj, prop, min, max) ->
+  if obj[prop] == undefined
+    console.log "#{obj}.#{prop} not found in addSlider!"
+    return
+
+  grp = game.add.group controls, "#{label}_ctl_group"
+  grp.fixedToCamera = true
+  grp.cameraOffset = { x: 0, y: sliders.length * 32 }
+
+  width = 0
+
+  labelText = game.add.text width, 8, label, {
+    font: "16px Arial", fill: "#ffffff", align: "right"
+  }, grp
+  width += labelText.width
+
+  slider = game.add.group grp, "#{label}_slider"
+  slider.x = width
+  handle = null
+  do ->
+    leftEdge = 0
+    rightEdge = scrW/4
+    groove = game.add.graphics 0, 0, slider
+    groove.lineStyle 2, 0xffffff
+    groove.moveTo 4, 16
+    groove.lineTo rightEdge-4, 16
+
+    hx = (obj[prop] / (max - min)) * rightEdge
+    handle = game.add.sprite hx, 16, 'slider_handle', 0, slider
+    handle.anchor = { x: 0.5, y: 0.5 }
+    handle.inputEnabled = true
+    handle.input.boundsRect = new Phaser.Rectangle(
+      0, 4, scrW / 4, 24
+    )
+    handle.input.draggable = true
+    handle.input.allowVerticalDrag = false
+    width += rightEdge
+
+  valueText = game.add.text width, 8, obj[prop], {
+    font: "16px Arial", fill: "#ffffff", align: "right"
+  }, grp
+  width += valueText.width + 64
+
+  bg = game.add.graphics 0, 0, grp
+  bg.beginFill 0x000000, 0.5
+  bg.drawRect 0, 0, width, 32
+  bg.endFill()
+  grp.sendToBack bg
+
+  handle.events.onDragUpdate.add ->
+    newVal = (handle.x / (scrW / 4)) * (max - min)
+    obj[prop] = newVal
+    valueText.setText newVal
+    return
+
+  sliders.push grp
+
+  return
 
 main()
