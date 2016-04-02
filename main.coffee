@@ -23,6 +23,7 @@ solidTileIndices = [2, 3, 4, 5, 6, 7, 8,
                     112, 113, 114,
                     121, 122, 123, 124, 125]
 
+
 main = ->
   game = new Phaser.Game scrW, scrH, Phaser.AUTO, '', {
     preload, create, render, update
