@@ -137,23 +137,50 @@ addSlider = (label, obj, prop, min, max) ->
   grp.x = 0
   grp.y = 0
 
+  width = 0
+
+  labelText = game.add.text width, 8, label, {
+    font: "16px Arial", fill: "#ffffff", align: "right"
+  }, grp
+  width += labelText.width
+
+  slider = game.add.group grp, "#{label}_slider"
+  slider.x = width
+  handle = null
+  do ->
+    leftEdge = 0
+    rightEdge = scrW/4
+    groove = game.add.graphics 0, 0, slider
+    groove.lineStyle 2, 0xffffff
+    groove.moveTo 4, 16
+    groove.lineTo rightEdge-4, 16
+
+    hx = (obj[prop] / (max - min)) * rightEdge
+    handle = game.add.sprite hx, 16, 'slider_handle', 0, slider
+    handle.anchor = { x: 0.5, y: 0.5 }
+    handle.inputEnabled = true
+    handle.input.boundsRect = new Phaser.Rectangle(
+      0, 4, scrW / 4, 28
+    )
+    handle.input.draggable = true
+    handle.input.allowVerticalDrag = false
+    width += rightEdge
+
+  valueText = game.add.text width, 8, obj[prop], {
+    font: "16px Arial", fill: "#ffffff", align: "right"
+  }, grp
+  width += valueText.width + 64
+
   bg = game.add.graphics 0, 0, grp
   bg.beginFill 0x000000, 0.5
-  bg.drawRect 0, 0, scrW / 4, 32
+  bg.drawRect 0, 0, width, 32
   bg.endFill()
+  grp.sendToBack bg
 
-  hx = (obj[prop] / (max - min)) * (scrW/4)
-  handle = game.add.sprite hx, 16, 'slider_handle', 0, grp
-  handle.anchor = { x: 0.5, y: 0.5 }
-  handle.inputEnabled = true
-  handle.input.boundsRect = new Phaser.Rectangle(
-    0, 4, scrW / 4, 28
-  )
-  handle.input.draggable = true
-  handle.input.allowVerticalDrag = false
   handle.events.onDragUpdate.add ->
     newVal = (handle.x / (scrW / 4)) * (max - min)
     obj[prop] = newVal
+    valueText.setText newVal
     return
 
   return
