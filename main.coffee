@@ -6,14 +6,14 @@
 scrW = 640
 scrH = 480
 
+controls = null
+cursors = null
 game = null
+keys = null
 layer = null
 flayer = null
-
-cursors = null
-jumpMaxHeight = 100
-keys = null
 player = null
+
 playerSpeed = 150
 
 solidTileIndices = [2, 3, 4, 5, 6, 7, 8,
@@ -34,6 +34,7 @@ preload = ->
   game.load.tilemap 'area01', 'assets/area01.json', null,
                     Phaser.Tilemap.TILED_JSON
   game.load.image 'area01_tiles', 'assets/area01_level_tiles.png'
+  game.load.image 'slider_handle', 'assets/slider-handle.png'
   game.load.spritesheet 'gripe', 'assets/gripe.png', 32, 32
   return
 
@@ -57,6 +58,7 @@ create = ->
   game.physics.arcade.enable player
   player.body.gravity.y = 2000
   player.grounded = false
+  player.jumpMaxHeight = 200
   player.jumpStartY = null
   player.jumpExhausted = false
   player.enableBody = true
@@ -72,6 +74,9 @@ create = ->
 
   flayer = map.createLayer 'foreground'
   map.setCollision solidTileIndices, true, flayer
+
+  controls = game.add.group undefined, 'control_group'
+  addSlider 'maxH', player, 'jumpMaxHeight', 0, 700
   return
 
 render = ->
@@ -97,7 +102,7 @@ update = ->
     if player.grounded
       player.jumpStartY = player.y
       player.grounded = false
-    if player.y < player.jumpStartY - jumpMaxHeight
+    if player.y < player.jumpStartY - player.jumpMaxHeight
       player.jumpExhausted = true
   else
     player.body.allowGravity = true
@@ -123,5 +128,30 @@ processPlayerTilemap = (player, tile) ->
            playerRight > tileLeft and playerLeft < tileRight)
     player.jumpExhausted = true
   true
+
+addSlider = (label, obj, prop, min, max) ->
+  if obj[prop] == undefined
+    console.log "#{obj}.#{prop} not found in addSlider!"
+  grp = game.add.group controls, "#{label}_ctl_group"
+  grp.fixedToCamera = true
+  grp.x = 0
+  grp.y = 0
+
+  bg = game.add.graphics 0, 0, grp
+  bg.beginFill 0x000000, 0.5
+  bg.drawRect 0, 0, scrW / 4, 32
+  bg.endFill()
+
+  hx = (obj[prop] / (max - min)) * (scrW/4)
+  handle = game.add.sprite hx, 16, 'slider_handle', 0, grp
+  handle.anchor = { x: 0.5, y: 0.5 }
+  handle.inputEnabled = true
+  handle.input.boundsRect = new Phaser.Rectangle(
+    0, 4, scrW / 4, 28
+  )
+  handle.input.draggable = true
+  handle.input.allowVerticalDrag = false
+
+  return
 
 main()
