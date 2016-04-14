@@ -44,6 +44,13 @@ create = ->
   cursors = game.input.keyboard.createCursorKeys()
   keys = game.input.keyboard.addKeys
     jump: Phaser.KeyCode.SPACEBAR
+  game.input.keyboard.addKeyCapture [
+    Phaser.KeyCode.SPACEBAR
+    Phaser.KeyCode.UP
+    Phaser.KeyCode.DOWN
+    Phaser.KeyCode.LEFT
+    Phaser.KeyCode.RIGHT
+  ]
 
   game.stage.backgroundColor = '#9bd4ff'
   map = game.add.tilemap 'area01'
